@@ -65,15 +65,14 @@ public class FileController {
 
     private EncryptionService encryptionService;
 
-    private int x=280;
-    private int y=80;
+//    private int x=280;
+//    private int y=80;
+    private int x;
+    private int y;
     private int nbSign=0;
     static String signedFileName="";
 
-    @GetMapping("/fileByProcessus")
-public File findByProcessus(@RequestParam Long id){
-    return storageService.findByProcessus(id);
-}
+
 
     @GetMapping("/filesByProcessus")
     public List<String> findFilesByProcessus(@RequestParam Long id){
@@ -96,8 +95,12 @@ public File findByProcessus(@RequestParam Long id){
         File fileFromProcessus = storageService.getFiless(filename1);
       File finalFile=storageService.getFiless("signed"+filename1);
 
-
-
+        User user=userRepository.findByUsername(email);
+        if(storageService.getFiless(filename1).getNbSignatures()==0)
+        {
+            x=280;
+            y=50;
+        }
 
 
 
@@ -125,7 +128,10 @@ public File findByProcessus(@RequestParam Long id){
         else
             doc.loadFromFile("C://users//Asus//downloads//" + "signed"+filename1);
 
-        PdfCertificate cert = new PdfCertificate("C:\\Users\\ASUS\\Downloads\\BNH_CERT.pfx", "123456");
+        System.out.println("*************");
+        System.out.println(doc.getPageSettings().getHeight());
+
+        PdfCertificate cert = new PdfCertificate("C:\\Users\\ASUS\\Downloads\\"+user.getFirst_name()+user.getLast_name()+".pfx", "123456");
         PdfSignature signature = new PdfSignature(doc, doc.getPages().get(0), cert, "MySignature");
         Rectangle2D rect = new Rectangle2D.Float();
         rect.setFrame(new Point2D.Float((float) doc.getPages().get(0).getActualSize().getWidth() - x, (float) doc.getPages().get(0).getActualSize().getHeight() - y), new Dimension(270, 100));
@@ -217,21 +223,23 @@ public File findByProcessus(@RequestParam Long id){
 //
       Processus pr= processusRepository.findProcessusByName("Processus_"+filename1);
 
-       User user=userRepository.findByUsername(email);
-        processusUserRepository.save(new processus_user(user,pr,"true"));
+        Date d1=new Date(System.currentTimeMillis());
+        processusUserRepository.save(new processus_user(user,pr,"true",d1));
 
 
 
         if(nbSign==1)
-            x=550;
+            x= (int) ((doc.getPages().get(0).getActualSize().getWidth())-30);
         else if(nbSign==2)
         {
             x=280;
-            y=130;
+            y=120;
+//            y=130;
 
         }
         else if(nbSign==3){
-            x=550;
+//            x=550;
+            x= (int) ((doc.getPages().get(0).getActualSize().getWidth())-30);
         }
         else{
             // set document permissions to prohibit changes
@@ -244,47 +252,7 @@ public File findByProcessus(@RequestParam Long id){
 
         doc.close();
 
-//        String id=getFileByName(filename);
-//        File f=storageService.getFile(id);
-//        System.out.println(id);
-//        System.out.println(f);
-//        MultipartFile f1=new MockMultipartFile("file",f.getName(),f.getType(),f.getData());
-//        byte[] d1=f1.getBytes();
-//        String dd=new String(d1);
-//        encryptionService=new EncryptionService();
-//        PrivateKey privateKey=encryptionService.privateKeyFromJKS("aziz.jks","123456","aziz");
-//        String data="a9wa aziz fl 3alem";
-//        byte[] base64ByteArray = Base64.encode(d1);
-//        String signature = encryptionService.rsaSign(base64ByteArray, privateKey);
-////            String signedDoc=dd+"_.._"+signature;
-//        System.out.println("Signature :"+signature);
-//
-//        String humanReadableString = new String(base64ByteArray);
-//
-//        System.out.println("==================");
-//        System.out.println("Signature verification");
-//        String signedDocReceived=humanReadableString+"_.._bkkLcTJuSTnsEt/GCwfh0efCDYsysyyGYY/+SUJZFnAsMCpsyhH7JKgFp/CNfZFhHZ+ujCSmweXktWdTxyYwBopsjcrEH+Narum5l6zD+M4rzb8HendO7QvkAI5p4pzC03ZjIF/aMoYGVCXlZqOdrIpkG33vXkmnTq2bLbP1BEnneBsLHxhhDvP3HzXQTAu0E1PoAabibzQokibZfcOc1UWxcx8iQfEvDwagP5OVtqoDNfvFCaIfuj7QUDCM0JxoxzCbHDOy5u/PTqR67t7JndsT+vGaL2yjmcMrfiYX/SZjjq1MOILOx5TEkBZ0DnQ/g5fWt3W9BrJ0GS29SD7XXA==";
-//        byte[] encryptedData=signedDocReceived.getBytes();
-//        MultipartFile finalFinal=new MockMultipartFile("file","signed_"+f1.getOriginalFilename(),f1.getContentType(),encryptedData);
-//        storageService.store(finalFinal);
-//        //Store encrypted file in processus
-//        String id1=storageService.getFiles(finalFinal.getOriginalFilename());
-//        File file_processus=storageService.getFile(id1);
-//        System.out.println("idFile: "+id1);
-//        Long id_Processus=processusService.getProcessusByName("processus_"+f1.getOriginalFilename());
-//        System.out.println("idProc: "+id_Processus);
-//        Processus processus=processusRepository.getById(id_Processus);
-//        processus.setStatus(Status.TERMINÉ);
-//        processusRepository.setFinalFileById(file_processus,id_Processus);
-////        Processus processus=new Processus(null,"ff",null,file_processus);
-////        processusService.saveProcessus(processus);
-//
-//
-//        PublicKey publicKey=encryptionService.publicKeyFromCertificate("myCertificate.cert");
-//        System.out.println("==================");
-//        boolean b = encryptionService.rsaSignVerify(signedDocReceived, publicKey);
-//        System.out.println("==================");
-//        System.out.println(b?"Signature ok":"Signature not ok");
+
             try {
 
 
@@ -372,57 +340,19 @@ public File findByProcessus(@RequestParam Long id){
 
 
 
-    @PostMapping("/uploaddd/{user}")
-    public ResponseEntity<ResponseMessage> uploadFilee(@RequestParam("files") MultipartFile[] files) throws Exception {
+    @PostMapping("/uploadd")
+    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("files") MultipartFile[] files) throws Exception {
+
+
+
         String message = "";
         MultipartFile fErr = null;
-        String fileName = StringUtils.cleanPath(files[0].getOriginalFilename());
-        File FileDB = new File(fileName, files[0].getContentType(), files[0].getBytes(), 0);
 
-
-
-        try {
-            for (MultipartFile f:files) {
-
-                fErr=f;
-                storageService.store(f,0);
-                String id=storageService.getFiles(f.getOriginalFilename());
-                File file=storageService.getFile(id);
-                Date d1=new Date(System.currentTimeMillis());
-                System.out.println(d1);
-//                Processus processus=new Processus((Long) null,"Processus_"+f.getOriginalFilename(),new Date(System.currentTimeMillis()), Status.EN_COURS,null,file,null);
-//                this.processusService.saveProcessus(processus);
-
-                Long idPr=processusRepository.findByName_processus("Processus_"+f.getOriginalFilename());
-                System.out.println("*************");
-                System.out.println("idPr: "+idPr);
-//                processusRepository.updateprocessus_userFalse(email,idPr);
-//                processusRepository.updateprocessus_userFalse(email,idPr);
-                message += "Uploaded the file successfully: " + f.getOriginalFilename()+"\\n";
-            }
-
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
-        } catch (Exception e) {
-            message = "Could not upload the file: " + fErr.getOriginalFilename() + "!";
+        if(storageService.getFiles(files[0].getOriginalFilename())!=null){
+            message = "fichier déja chargé:  !";
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
         }
 
-    }
-
-
-
-
-
-
-
-
-
-
-
-    @PostMapping("/uploadd")
-    public ResponseEntity<ResponseMessage> uploadFile(@RequestParam("files") MultipartFile[] files) throws Exception {
-        String message = "";
-        MultipartFile fErr = null;
         String fileName = StringUtils.cleanPath(files[0].getOriginalFilename());
         File FileDB = new File(fileName, files[0].getContentType(), files[0].getBytes(), 0);
 
@@ -489,92 +419,11 @@ public File findByProcessus(@RequestParam Long id){
     }
 
 
-
-
-
-
-//    private static final String EXTERNAL_FILE_PATH = "C:/fileDownloadExample/";
-
-    //define a method to upload files
-//    @PostMapping("/upload")
-//    public ResponseEntity<List<String>> uploadFiles(@RequestParam("files")List<MultipartFile> multipartFiles) throws IOException {
-//        List<String> filenames=new ArrayList<>();
-//        for(MultipartFile file:multipartFiles){
-//            String filename= StringUtils.cleanPath(file.getOriginalFilename());
-//            Path fileStorage=get(DIRECTORY,filename).toAbsolutePath().normalize();
-//
-//            try {
-//                Files.copy(file.getInputStream(), fileStorage, REPLACE_EXISTING);
-//                filenames.add(filename);
-//
-//
-//            }
-//            catch(IOException e){
-//                    System.out.println(e);
-//                }
-//
-//        }
-//        return ResponseEntity.ok().body(filenames);
-//    }
-
-    @GetMapping(value = "downloadd/{filename}")
-    public ResponseEntity<Resource> downloadFiless(@PathVariable("filename") String filename)  {
-
-        File file=storageService.getFiless(filename);
-
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(file.getType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getName() + "\"")
-                .body(new ByteArrayResource(file.getData()));
-
-    }
-//
-//    @GetMapping(value = "view/{filename}")
-//    public ResponseEntity<Resource> viewFiless(@PathVariable("filename") String filename)  {
-//
-//        File file=storageService.getFiless(filename);
-//
-//        return ResponseEntity.ok()
-//                .contentType(MediaType.parseMediaType(file.getType()))
-//                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getName() + "\"")
-//                .body(new ByteArrayResource(file.getData()));
-//
-//    }
-
-
-
-//    //define a location
-//    public static final String DIRECTORY=System.getProperty("user.home")+"/Downloads/";
-//
     //define a method to download files
-    @GetMapping(value="/download/{filename}")
+    @GetMapping(value="/downloadd/{filename}")
     public ResponseEntity<FileSystemResource> downloadFiles(@PathVariable("filename") String filename) throws IOException {
-//        Path filePath=get(DIRECTORY).toAbsolutePath()
-//                .normalize()
-//                .resolve(filename);
+
         FileSystemResource resource = new FileSystemResource("c://users//asus//Downloads//"+filename);
-        //ByteArrayResource resource1 = new ByteArrayResource(Files.readAllBytes(filePath));
-
-//        if(!Files.exists(filePath))
-//        {
-//            throw new FileNotFoundException(filename+" was not found on the server");
-//        }
-//        System.out.println(filePath);
-//        //Resource resource=new UrlResource(filePath.toUri());
-//        HttpHeaders httpHeaders=new HttpHeaders();
-//        httpHeaders.add(CONTENT_DISPOSITION,"attachment; filename="+resource.getFilename()+"\"");
-//        httpHeaders.add("filename",filename);
-//        httpHeaders.add("Cache-Control", "no-cache, no-store, must-revalidate");
-//        httpHeaders.add("Pragma", "no-cache");
-//        httpHeaders.add("Expires", "0");
-
-
-
-
-
-
-
 
         MediaType mediaType = MediaTypeFactory
                 .getMediaType(resource)
@@ -624,15 +473,7 @@ public File findByProcessus(@RequestParam Long id){
 
     }
 
-    @GetMapping("/d/{fileId}")
-    public  ResponseEntity<ByteArrayResource> downloadFile(@PathVariable String fileId)
-    {
-        File file=storageService.getFile(fileId);
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(file.getType()))
-                .header(CONTENT_DISPOSITION,"attachment:filename=\""+file.getName()+"\"")
-                .body(new ByteArrayResource(file.getData()));
-    }
+
 
 
 }

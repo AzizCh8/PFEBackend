@@ -41,7 +41,7 @@ public class FileStorageService {
 
 
 
-    public File findByProcessus(Long id){return fileRepository.findByProcessus(id);}
+
 
     public List<String> findFilesByProcessus(Long id){return fileRepository.findFilesByProcessus(id);}
 

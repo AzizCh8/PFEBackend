@@ -58,6 +58,18 @@ public class EmailController {
 
     }
 
+    @PostMapping(value = "/emailFrom")
+    public ResponseEntity<Email> enviarEmailFrom(@RequestBody Email email){
+        try {
+            emailService.sendEmailFrom(email.getFrom(),email.getTo(),email.getObject(),email.getMessage());
+            return new ResponseEntity<>(email,  HttpStatus.OK);
+        } catch( MailException e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
     @PostMapping(value = "/emailSign")
     public ResponseEntity<Email> enviarEmail1(@RequestBody Email email){
         try {
@@ -76,7 +88,7 @@ public class EmailController {
 //            processusService.saveProcessus(processus);
 //            Long idPr=processusRepository.findByName_processus("processus_"+email.getAttachment());
 //            System.out.println(processus.getSignataires().toArray().length);
-            processusUserRepository.save(new processus_user(user,processus,"false"));
+            processusUserRepository.save(new processus_user(user,processus,"false",null));
 //            processusRepository.updateprocessus_userFalse(email.getTo(),idPr);
             emailService.sendEmail(email.getTo(),email.getObject(),email.getMessage());
             return new ResponseEntity<>(email,  HttpStatus.OK);

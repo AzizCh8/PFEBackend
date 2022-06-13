@@ -44,7 +44,7 @@ public class ProcessusController {
 
 
     @GetMapping("/usersByProcessusId")
-    public List<User> getUsersByProcessusId(@Param("idP") Long idP)
+    public List<User> getUsersByProcessusId(@RequestParam("idP") Long idP)
     {
            List<User> users=userRepository.findUsersByProcessusId(idP);
         return users;

@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -32,9 +33,15 @@ public class processus_user {
     @Column(name = "signed")
     private String signed;
 
-    public processus_user(User user, Processus processus,String signed) {
+
+    @Column(name = "signature_date")
+    private Date signature_date;
+
+
+    public processus_user(User user, Processus processus,String signed,Date signature_date) {
         this.user = user;
         this.processus = processus;
         this.signed = signed;
+        this.signature_date=signature_date;
     }
 }

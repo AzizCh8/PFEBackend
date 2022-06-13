@@ -28,6 +28,18 @@ public class EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+
+    public void sendEmailFrom(String from,String to,String object,String message)throws MailException{
+        SimpleMailMessage mail = new SimpleMailMessage();
+        mail.setFrom(from);
+        mail.setTo(to);
+        mail.setSubject(object);
+        mail.setText(message);
+
+        javaMailSender.send(mail);
+        System.out.println("message sent");
+    }
+
     public void sendEmail(String to,String object,String message) throws MailException {
         SimpleMailMessage mail = new SimpleMailMessage();
         mail.setTo(to);
